@@ -11,6 +11,18 @@ public class NoteService {
     private final Map<Long, Note> notes = new HashMap<>();
     private final AtomicLong idCount = new AtomicLong(1);
 
+    public NoteService() {
+        Note note1 = new Note();
+        note1.setTitle("Work");
+        note1.setContent("work content");
+        add(note1);
+
+        Note note2 = new Note();
+        note2.setTitle("Study");
+        note2.setContent("study content");
+        add(note2);
+    }
+
     public List<Note> listAll() {
         return new ArrayList<>(notes.values());
     }
