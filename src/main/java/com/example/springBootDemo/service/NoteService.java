@@ -1,59 +1,46 @@
 package com.example.springBootDemo.service;
 
 import com.example.springBootDemo.model.Note;
+import com.example.springBootDemo.repository.NoteRepository;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+@RequiredArgsConstructor
 @Service
 public class NoteService {
-    private final Map<Long, Note> notes = new HashMap<>();
-    private final AtomicLong idCount = new AtomicLong(1);
 
-    public NoteService() {
-        Note note1 = new Note();
-        note1.setTitle("Work");
-        note1.setContent("work content");
-        add(note1);
-
-        Note note2 = new Note();
-        note2.setTitle("Study");
-        note2.setContent("study content");
-        add(note2);
-    }
+    private final NoteRepository noteRepository;
 
     public List<Note> listAll() {
-        return new ArrayList<>(notes.values());
+        return noteRepository.findAll();
     }
 
-    public Note getById(long id) {
-        Note note = notes.get(id);
-        if (note == null) {
-            throw new NoSuchElementException("Note with Id " + id + " not found.");
-        }
-        return note;
+    public Note getById(Integer id) {
+        return noteRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Note with Id " + id + " not found."));
     }
 
     public Note add(Note note) {
-        long id = idCount.getAndIncrement();
-        note.setId(id);
-        notes.put(id, note);
-        return note;
+        return noteRepository.save(note);
     }
 
-    public void deleteById(Long id) {
-        if (!notes.containsKey(id)) {
-            throw new NoSuchElementException("Note with Id " + id + " not found.");
+    public void deleteById(Integer id) {
+        if (!noteRepository.existsById(id)) {
+            throw new NoSuchElementException("Note with Id " + id + " does not exist.");
         }
-        notes.remove(id);
+        noteRepository.deleteById(id);
     }
 
-    public void update(Note note) {
-        if (!notes.containsKey(note.getId())) {
-            throw new NoSuchElementException("Note with Id " + note.getId() + " not found.");
-        }
-        notes.put(note.getId(), note);
-    }
+    public Note update(Integer id, Note updateNote) {
+        Note existingNote = noteRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Note with id " + id + " not found."));
 
+        existingNote.setTitle(updateNote.getTitle());
+        existingNote.setContent(updateNote.getContent());
+        return noteRepository.save(existingNote);
+    }
 }

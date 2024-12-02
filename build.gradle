@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id "org.flywaydb.flyway" version "9.22.3"
 }
 
 group = 'com.example'
@@ -10,6 +11,12 @@ version = '0.0.1-SNAPSHOT'
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
 	}
 }
 
@@ -24,10 +31,27 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.4.0'
+
+
+	implementation group: 'com.h2database', name: 'h2', version: '2.3.232'
+
+	implementation 'org.flywaydb:flyway-core'
+
 
 	compileOnly 'org.projectlombok:lombok:1.18.34'
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
+
+flyway {
+	url = 'jdbc:h2:~/NoteService'
+	user = ''
+	password = ''
+	schemas = ['public']
+	locations = ['classpath:db/migration']
+}
+
+
 
 tasks.named('test') {
 	useJUnitPlatform()

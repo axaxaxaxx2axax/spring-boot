@@ -25,7 +25,7 @@ public class NoteController {
     }
 
     @PostMapping("/delete/{id}")
-    public ModelAndView delete(@PathVariable Long id) {
+    public ModelAndView delete(@PathVariable Integer id) {
         try {
             noteService.deleteById(id);
             return new ModelAndView(new RedirectView("/note/list", true))
@@ -37,7 +37,7 @@ public class NoteController {
     }
 
     @GetMapping("/edit")
-    public ModelAndView edit(@RequestParam Long id) {
+    public ModelAndView edit(@RequestParam Integer id) {
         ModelAndView modelAndView = new ModelAndView("edit");
         try {
             Note note = noteService.getById(id);
@@ -50,9 +50,24 @@ public class NoteController {
     }
 
     @PostMapping("/edit")
-    public ModelAndView update(Note note) {
-        noteService.update(note);
+    public ModelAndView update(@ModelAttribute("note") Note note) {
+        noteService.update(note.getId(), note);
         return new ModelAndView(new RedirectView("/note/list", true))
-                .addObject("successMessage", "Note update");
+                .addObject("successMessage", "Note updated successfully");
     }
+
+    @GetMapping("/add")
+    public ModelAndView addForm() {
+        ModelAndView modelAndView = new ModelAndView("add");
+        modelAndView.addObject("note", new Note());
+        return modelAndView;
+    }
+
+    @PostMapping("/add")
+    public ModelAndView add(@ModelAttribute("note") Note note) {
+        noteService.add(note);
+        return new ModelAndView(new RedirectView("/note/list", true))
+                .addObject("successMessage", "Note added successfully");
+    }
+
 }
